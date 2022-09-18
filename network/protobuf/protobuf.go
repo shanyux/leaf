@@ -69,7 +69,7 @@ func (p *Processor) Register(msg proto.Message) uint16 {
 	if _, ok := p.msgIdInfoMap[id]; ok {
 		log.Fatal("message id %s is already registered", msgType)
 	}
-
+	p.msgIdInfoMap[id] = msgType
 	p.msgID[msgType] = id
 	return id
 }
@@ -90,11 +90,12 @@ func (p *Processor) RegisterWithId(msg proto.Message, id uint16) uint16 {
 	if len(p.msgInfo) >= math.MaxUint16 {
 		log.Fatal("too many protobuf messages (max = %v)", math.MaxUint16)
 	}
-
 	i := new(MsgInfo)
 	i.msgType = msgType
 	p.msgInfo = append(p.msgInfo, i)
 	// id := uint16(len(p.msgInfo) - 1)
+
+	p.msgIdInfoMap[id] = msgType
 	p.msgID[msgType] = id
 	return id
 }

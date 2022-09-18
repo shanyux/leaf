@@ -65,6 +65,11 @@ func (p *Processor) Register(msg proto.Message) uint16 {
 	i.msgType = msgType
 	p.msgInfo = append(p.msgInfo, i)
 	id := uint16(len(p.msgInfo) - 1)
+
+	if _, ok := p.msgIdInfoMap[id]; ok {
+		log.Fatal("message id %s is already registered", msgType)
+	}
+
 	p.msgID[msgType] = id
 	return id
 }

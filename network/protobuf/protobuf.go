@@ -40,6 +40,8 @@ func NewProcessor() *Processor {
 	p := new(Processor)
 	p.littleEndian = false
 	p.msgID = make(map[reflect.Type]uint16)
+	p.msgIdInfoMap = make(map[uint16]reflect.Type)
+
 	return p
 }
 

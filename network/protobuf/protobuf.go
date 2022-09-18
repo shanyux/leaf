@@ -16,10 +16,12 @@ import (
 // | id | protobuf message |
 // -------------------------
 type Processor struct {
-	littleEndian bool
-	msgInfo      []*MsgInfo
-	msgIdInfoMap map[uint16]reflect.Type
-	msgID        map[reflect.Type]uint16
+	littleEndian        bool
+	msgInfo             []*MsgInfo
+	msgExternalId2IdMap map[uint16]uint16
+	msgId2ExternalIdMap map[uint16]uint16
+
+	msgID map[reflect.Type]uint16
 }
 
 type MsgInfo struct {
@@ -40,7 +42,8 @@ func NewProcessor() *Processor {
 	p := new(Processor)
 	p.littleEndian = false
 	p.msgID = make(map[reflect.Type]uint16)
-	p.msgIdInfoMap = make(map[uint16]reflect.Type)
+	p.msgExternalId2IdMap = make(map[uint16]uint16)
+	p.msgId2ExternalIdMap = make(map[uint16]uint16)
 
 	return p
 }
@@ -68,16 +71,15 @@ func (p *Processor) Register(msg proto.Message) uint16 {
 	p.msgInfo = append(p.msgInfo, i)
 	id := uint16(len(p.msgInfo) - 1)
 
-	if _, ok := p.msgIdInfoMap[id]; ok {
+	if _, ok := p.msgId2ExternalIdMap[id]; ok {
 		log.Fatal("message id %s is already registered", msgType)
 	}
-	p.msgIdInfoMap[id] = msgType
 	p.msgID[msgType] = id
 	return id
 }
 
 // It's dangerous to call the method on routing or marshaling (unmarshaling)
-func (p *Processor) RegisterWithId(msg proto.Message, id uint16) uint16 {
+func (p *Processor) RegisterWithId(msg proto.Message, externalId uint16) uint16 {
 	msgType := reflect.TypeOf(msg)
 	if msgType == nil || msgType.Kind() != reflect.Ptr {
 		log.Fatal("protobuf message pointer required")
@@ -85,8 +87,8 @@ func (p *Processor) RegisterWithId(msg proto.Message, id uint16) uint16 {
 	if _, ok := p.msgID[msgType]; ok {
 		log.Fatal("message %s is already registered", msgType)
 	}
-	if _, ok := p.msgIdInfoMap[id]; ok {
-		log.Fatal("message id %s is already registered", msgType)
+	if _, ok := p.msgExternalId2IdMap[externalId]; ok {
+		log.Fatal("message externalId %s is already registered", msgType)
 	}
 
 	if len(p.msgInfo) >= math.MaxUint16 {
@@ -95,9 +97,11 @@ func (p *Processor) RegisterWithId(msg proto.Message, id uint16) uint16 {
 	i := new(MsgInfo)
 	i.msgType = msgType
 	p.msgInfo = append(p.msgInfo, i)
-	// id := uint16(len(p.msgInfo) - 1)
+	id := uint16(len(p.msgInfo) - 1)
 
-	p.msgIdInfoMap[id] = msgType
+	p.msgExternalId2IdMap[externalId] = id
+	p.msgId2ExternalIdMap[id] = externalId
+
 	p.msgID[msgType] = id
 	return id
 }
@@ -170,12 +174,18 @@ func (p *Processor) Unmarshal(data []byte) (interface{}, error) {
 	}
 
 	// id
-	var id uint16
+	var externalId, id uint16
 	if p.littleEndian {
-		id = binary.LittleEndian.Uint16(data)
+		externalId = binary.LittleEndian.Uint16(data)
 	} else {
-		id = binary.BigEndian.Uint16(data)
+		externalId = binary.BigEndian.Uint16(data)
 	}
+	id, ok := p.msgId2ExternalIdMap[externalId]
+	if !ok {
+		log.Errorf("message externalId %d is not define", externalId)
+		return nil, fmt.Errorf("message id %v not define", externalId)
+	}
+
 	if id >= uint16(len(p.msgInfo)) {
 		return nil, fmt.Errorf("message id %v not registered", id)
 	}
@@ -201,11 +211,17 @@ func (p *Processor) Marshal(msg interface{}) ([][]byte, error) {
 		return nil, err
 	}
 
+	externalId, ok := p.msgId2ExternalIdMap[_id]
+	if !ok {
+		log.Errorf("message externalId %d is not define", externalId)
+		return nil, fmt.Errorf("message id %v not define", externalId)
+	}
+
 	id := make([]byte, 2)
 	if p.littleEndian {
-		binary.LittleEndian.PutUint16(id, _id)
+		binary.LittleEndian.PutUint16(id, externalId)
 	} else {
-		binary.BigEndian.PutUint16(id, _id)
+		binary.BigEndian.PutUint16(id, externalId)
 	}
 
 	// data

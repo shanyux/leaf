@@ -180,7 +180,7 @@ func (p *Processor) Unmarshal(data []byte) (interface{}, error) {
 	} else {
 		externalId = binary.BigEndian.Uint16(data)
 	}
-	id, ok := p.msgId2ExternalIdMap[externalId]
+	id, ok := p.msgExternalId2IdMap[externalId]
 	if !ok {
 		log.Error("message externalId %d is not define", externalId)
 		return nil, fmt.Errorf("message id %v not define", externalId)

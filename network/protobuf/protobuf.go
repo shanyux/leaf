@@ -182,7 +182,7 @@ func (p *Processor) Unmarshal(data []byte) (interface{}, error) {
 	}
 	id, ok := p.msgId2ExternalIdMap[externalId]
 	if !ok {
-		log.Errorf("message externalId %d is not define", externalId)
+		log.Error("message externalId %d is not define", externalId)
 		return nil, fmt.Errorf("message id %v not define", externalId)
 	}
 
@@ -213,7 +213,7 @@ func (p *Processor) Marshal(msg interface{}) ([][]byte, error) {
 
 	externalId, ok := p.msgId2ExternalIdMap[_id]
 	if !ok {
-		log.Errorf("message externalId %d is not define", externalId)
+		log.Error("message externalId %d is not define", externalId)
 		return nil, fmt.Errorf("message id %v not define", externalId)
 	}
 

@@ -1,11 +1,11 @@
 package leaf
 
 import (
-	"github.com/name5566/leaf/cluster"
-	"github.com/name5566/leaf/conf"
-	"github.com/name5566/leaf/console"
-	"github.com/name5566/leaf/log"
-	"github.com/name5566/leaf/module"
+	"github.com/shanyux/leaf/cluster"
+	"github.com/shanyux/leaf/conf"
+	"github.com/shanyux/leaf/console"
+	"github.com/shanyux/leaf/log"
+	"github.com/shanyux/leaf/module"
 	"os"
 	"os/signal"
 )

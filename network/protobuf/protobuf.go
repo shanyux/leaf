@@ -8,8 +8,8 @@ import (
 	"reflect"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/name5566/leaf/chanrpc"
-	"github.com/name5566/leaf/log"
+	"github.com/shanyux/leaf/chanrpc"
+	"github.com/shanyux/leaf/log"
 )
 
 // -------------------------

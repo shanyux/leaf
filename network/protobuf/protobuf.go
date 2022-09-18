@@ -4,11 +4,12 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"math"
+	"reflect"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/name5566/leaf/chanrpc"
 	"github.com/name5566/leaf/log"
-	"math"
-	"reflect"
 )
 
 // -------------------------
@@ -17,6 +18,7 @@ import (
 type Processor struct {
 	littleEndian bool
 	msgInfo      []*MsgInfo
+	msgIdInfoMap map[uint16]reflect.Type
 	msgID        map[reflect.Type]uint16
 }
 
@@ -63,6 +65,31 @@ func (p *Processor) Register(msg proto.Message) uint16 {
 	i.msgType = msgType
 	p.msgInfo = append(p.msgInfo, i)
 	id := uint16(len(p.msgInfo) - 1)
+	p.msgID[msgType] = id
+	return id
+}
+
+// It's dangerous to call the method on routing or marshaling (unmarshaling)
+func (p *Processor) RegisterWithId(msg proto.Message, id uint16) uint16 {
+	msgType := reflect.TypeOf(msg)
+	if msgType == nil || msgType.Kind() != reflect.Ptr {
+		log.Fatal("protobuf message pointer required")
+	}
+	if _, ok := p.msgID[msgType]; ok {
+		log.Fatal("message %s is already registered", msgType)
+	}
+	if _, ok := p.msgIdInfoMap[id]; ok {
+		log.Fatal("message id %s is already registered", msgType)
+	}
+
+	if len(p.msgInfo) >= math.MaxUint16 {
+		log.Fatal("too many protobuf messages (max = %v)", math.MaxUint16)
+	}
+
+	i := new(MsgInfo)
+	i.msgType = msgType
+	p.msgInfo = append(p.msgInfo, i)
+	// id := uint16(len(p.msgInfo) - 1)
 	p.msgID[msgType] = id
 	return id
 }

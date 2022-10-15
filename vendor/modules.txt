@@ -2,19 +2,6 @@
 github.com/golang/protobuf/proto
 # github.com/gorilla/websocket v1.5.0
 github.com/gorilla/websocket
-# github.com/shanyux/leaf v0.0.0-20220918132121-418534d56c1e
-github.com/shanyux/leaf/cluster
-github.com/shanyux/leaf/conf
-github.com/shanyux/leaf/console
-github.com/shanyux/leaf/log
-github.com/shanyux/leaf/module
-github.com/shanyux/leaf/network
-github.com/shanyux/leaf/chanrpc
-github.com/shanyux/leaf/go
-github.com/shanyux/leaf/timer
-github.com/shanyux/leaf/db/mongodb
-github.com/shanyux/leaf/recordfile
-github.com/shanyux/leaf/util
 # google.golang.org/protobuf v1.26.0
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire

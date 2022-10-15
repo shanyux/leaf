@@ -1,4 +1,4 @@
-module github.com/shanyux/leaf/leaf
+module github.com/shanyux/leaf
 
 go 1.12
 

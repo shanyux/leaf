@@ -136,7 +136,7 @@ func (s *Server) Exec(ci *CallInfo) {
 }
 
 // goroutine safe
-func (s *Server) Go(id interface{}, args ...interface{}) {
+func (s *Server) PushChan(id interface{}, args ...interface{}) {
 	f := s.functions[id]
 	if f == nil {
 		return

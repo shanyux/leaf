@@ -12,7 +12,7 @@ func Example() {
 
 	// go 1
 	var res int
-	d.Go(func() {
+	d.GoToExec(func() {
 		fmt.Println("1 + 1 = ?")
 		res = 1 + 1
 	}, func() {
@@ -22,7 +22,7 @@ func Example() {
 	d.Cb(<-d.ChanCb)
 
 	// go 2
-	d.Go(func() {
+	d.GoToExec(func() {
 		fmt.Print("My name is ")
 	}, func() {
 		fmt.Println("Leaf")
@@ -40,11 +40,11 @@ func ExampleLinearContext() {
 	d := g.New(10)
 
 	// parallel
-	d.Go(func() {
+	d.GoToExec(func() {
 		time.Sleep(time.Second / 2)
 		fmt.Println("1")
 	}, nil)
-	d.Go(func() {
+	d.GoToExec(func() {
 		fmt.Println("2")
 	}, nil)
 
@@ -53,11 +53,11 @@ func ExampleLinearContext() {
 
 	// linear
 	c := d.NewLinearContext()
-	c.Go(func() {
+	c.GoToExec(func() {
 		time.Sleep(time.Second / 2)
 		fmt.Println("1")
 	}, nil)
-	c.Go(func() {
+	c.GoToExec(func() {
 		fmt.Println("2")
 	}, nil)
 

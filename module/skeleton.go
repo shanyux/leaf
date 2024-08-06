@@ -14,7 +14,7 @@ type Skeleton struct {
 	TimerDispatcherLen int
 	AsynCallLen        int
 	ChanRPCServer      *chanrpc.Server
-	g                  *g.Go
+	g                  *g.FastGo
 	dispatcher         *timer.Dispatcher
 	client             *chanrpc.Client
 	server             *chanrpc.Server
@@ -89,7 +89,7 @@ func (s *Skeleton) Go(f func(), cb func()) {
 		panic("invalid GoLen")
 	}
 
-	s.g.Go(f, cb)
+	s.g.GoToExec(f, cb)
 }
 
 func (s *Skeleton) NewLinearContext() *g.LinearContext {
